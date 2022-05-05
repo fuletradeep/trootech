@@ -82,7 +82,7 @@ const Regestration = ({setCurrentScreen, navigation,otp,setOtp}) => {
 
       <GradientButton
         btn_name={translate('get_otp')}
-        // loading={auth.loading}
+        loading={auth.loading}
         buttonHandler={RegestrationButtonHandler}
         btn_style={[LoginButton, {marginTop: calculateHeight(20)}]}
         text_style={LoginButtonText}

@@ -91,7 +91,7 @@ const Login = ({navigation}) => {
       </View>
 
       <GradientButton
-        // loading={auth.loading}
+        loading={auth.loading}
         btn_name={translate('verify_otp')}
         buttonHandler={loginButtonHandler}
         btn_style={LoginButton}
