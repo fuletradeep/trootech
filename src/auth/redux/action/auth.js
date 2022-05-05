@@ -68,3 +68,9 @@ export const loginHandler = async (dispatch, otp, device_type) => {
       console.log('Login Error', error);
     });
 };
+
+export const getSessionToken = async () => {
+  let access_token = await AsyncStorage.getItem('access_token');
+  return access_token;
+};
+

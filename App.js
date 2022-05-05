@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -23,32 +23,43 @@ import store from './config/store';
 import StackNavigation from './navigation/StackNavigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingActivity from './component/loading/LoadingActivity';
+import BannerAlert from './component/aler/BannerAlert';
 
 const App = () => {
+  const [isUserLogin, setIsUserLogin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [isUserLogin,setIsUserLogin] = useState(false)
-  const [loading,setLoading] = useState(true)
+  useEffect(async () => {
+    const access_token = await AsyncStorage.getItem('access_token');
 
-  useEffect(async()=>{
-    const access_token = await AsyncStorage.getItem('access_token')
-
-    console.log('^^^^',access_token);
-
-    if (access_token == '' || access_token == null || access_token == undefined) {
-      setIsUserLogin(false)
-      setLoading(false)
+    if (
+      access_token == '' ||
+      access_token == null ||
+      access_token == undefined
+    ) {
+      setIsUserLogin(false);
+      setLoading(false);
+    } else {
+      setIsUserLogin(true);
+      setLoading(false);
     }
-    else{
-      setIsUserLogin(true)
-      setLoading(false)
-    }
-  },[])
+  }, []);
   return (
     <SafeAreaView style={{flex: 1}}>
       <Provider store={store}>
-        {
-          loading ? <LoadingActivity /> : isUserLogin ? <AppStack /> : <StackNavigation />
-        }
+        {loading ? (
+          <LoadingActivity />
+        ) : isUserLogin ? (
+          <>
+            <BannerAlert />
+            <AppStack />
+          </>
+        ) : (
+          <>
+            <BannerAlert />
+            <StackNavigation />
+          </>
+        )}
       </Provider>
     </SafeAreaView>
   );

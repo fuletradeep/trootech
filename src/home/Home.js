@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   calculateHeight,
   calculateWidth,
@@ -22,9 +22,17 @@ import {translate} from '../../translation/LanguageManager';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import AcordingList from '../../component/acording_list/AcordingList';
+import { GetHomeData } from './redux/action/home';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Home = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const home = useSelector(state => state.home)
+
+  useEffect(() => {
+    GetHomeData(dispatch)
+  },[])
   return (
     <View style={styles.mainContainer}>
       <ImageBackground
@@ -48,7 +56,7 @@ const Home = () => {
 
         <Text
           style={styles.userName}>
-          Jhon Doe
+          {home.user.first_name}
         </Text>
       </ImageBackground>
 
