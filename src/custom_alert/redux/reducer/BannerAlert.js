@@ -42,7 +42,7 @@ export default (state = initialState, action) => {
     case types.CLEAR_BANNER_ALERT: {
       return {
         loading: false,
-        // alert_array: [],
+        alert_array: [],
       };
     }
     case types.CLEAR_ONE_NOTIFICATION: {

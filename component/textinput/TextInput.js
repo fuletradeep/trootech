@@ -41,7 +41,6 @@ const CustomTextInput = ({
   return (
     <PaperProvider theme={theme}>
       <TextInput
-        keyboardType='numeric'
         scrollEnabled={true}
         disabled={disabled}
         autoCapitalize="none"

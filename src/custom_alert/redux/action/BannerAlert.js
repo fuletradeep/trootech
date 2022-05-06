@@ -50,11 +50,12 @@ export const showBannerAlert = async (dispatch, object) => {
       id: Math.random(),
       priority: object.priority,
     };
-    // dispatch(getClearAlert());
+    
 
     dispatch(getAlertFinish(alertObject));
     setTimeout(() => {
       previousMessage=''
+      dispatch(getClearAlert());
     }, 6000);
   }
 };

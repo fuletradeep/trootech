@@ -43,9 +43,10 @@ const Login = ({navigation}) => {
   const auth = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
-  const otp = auth.otp
+  
 
   const [email, setEmail] = useState('');
+  const [otp,setOtp] = useState(auth.otp)
   const [password, setPassword] = useState('');
   const [isEmailInvalid, setIsEmailInvalid] = useState(false);
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
@@ -69,7 +70,7 @@ const Login = ({navigation}) => {
           focusable={isEmailInvalid}
           label={translate('otp')}
           value={otp}
-          setValue={setEmail}
+          setValue={setOtp}
           style={{
             marginTop: isEmailInvalid
               ? calculateHeight(19)

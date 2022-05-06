@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "81872013532",
+    "project_id": "deepinterviewdemo",
+    "storage_bucket": "deepinterviewdemo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81872013532:android:6d5686b8f4fb7a45f10c19",
+        "android_client_info": {
+          "package_name": "com.trootech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "81872013532-4s22lrcab89f44dous9s0bmhaa9r85it.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA50M7YP37TMx4qcHKZzPoCUUwY-Vb-swc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "81872013532-4s22lrcab89f44dous9s0bmhaa9r85it.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

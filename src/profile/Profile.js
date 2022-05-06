@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,25 +7,40 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { calculateHeight, calculateWidth, colors, sizes } from '../../constant/theme';
+import database from '@react-native-firebase/database';
+import { useFocusEffect } from '@react-navigation/native';
+ const Profile = () => {
 
-export default class Profile extends Component {
+  const [user,setUser] = useState({})
+ 
 
-  render() {
+  useFocusEffect(
+    React.useCallback(() => {
+      const unsubscribe = database().ref('Users/firebasedata').once('value', function (snapshot) {
+        console.log(snapshot.val())
+        setUser(snapshot.val())
+    });
+      return () => {};
+    }, [])
+  );
+
     return (
       <View style={styles.container}>
           <View style={styles.header}></View>
           <Image style={styles.avatar} source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}/>
           <View style={styles.body}>
             <View style={styles.bodyContent}>
-              <Text style={styles.name}>John Doe</Text>
-              <Text style={styles.info}>React native / Mobile developer</Text>
+              <Text style={styles.name}>{user.first_name} {user.last_name}</Text>
+              <Text style={styles.info}>{user.type}</Text>
               <Text style={styles.description}>Lorem ipsum dolor sit amet, saepe sapientem eu nam. Qui ne assum electram expetendis, omittam deseruisse consequuntur ius an,</Text>
             </View>
         </View>
       </View>
     );
-  }
+  
 }
+
+export default Profile
 
 const styles = StyleSheet.create({
   header:{

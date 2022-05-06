@@ -1,330 +1,185 @@
-import React, {useEffect, useRef, useState} from 'react';
 import {
-  Alert,
-  BackHandler,
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
-import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
-import Footer from '../../component/footer/Footer';
-import Header from '../../component/header/Header';
+import React, {useEffect, useState} from 'react';
 import {
   calculateHeight,
   calculateWidth,
   colors,
-  Height,
   sizes,
-  Width,
 } from '../../constant/theme';
-import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-import {translate} from '../../translation/LanguageManager';
-import ImagePickerComponent from '../../component/image_picker/ImagePickerComponent';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import TextInput from '../../component/textinput/TextInput';
-import CancelIcon from '../../component/cancel_icon/CancelIcon';
-import {useFocusEffect} from '@react-navigation/core';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {editProfile, localLanguage} from '../../config/string';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import database from '@react-native-firebase/database';
+import { showBannerAlert } from '../custom_alert/redux/action/BannerAlert';
+import { useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { BannerSuccess } from '../../config/string';
 
-const EditProfile = ({navigation}) => {
-  
-
-  const refRBSheet = useRef();
-
-  const [email, setEmail] = useState('');
-  const [gender, setGender] = useState('');
+const EditProfile = () => {
+  const navigation = useNavigation();
+  const [user, setUser] = useState({});
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [avatar, setAvatar] = useState('');
-  const [firstNameErrorFlag, setFirstNameErrorFlag] = useState(false);
-  const [lastNameErrorFlag, setlastNameErrorFlag] = useState(false);
-  const [showDropDown, setShowDropDown] = useState(false);
-  const [validationError, setvalidationError] = useState('');
 
-  
+  const dispatch = useDispatch()
 
-//   useFocusEffect(
-//     React.useCallback(() => {
-//       return () => {
-//         getPreviousUserImage(dispatch);
-//       };
-//     }, []),
-//   );
-  const regex = /[a-zA-Z]$/g;
+  useEffect(() => {
+    database()
+      .ref('Users/firebasedata')
+      .once('value', function (snapshot) {
+        console.log(snapshot.val());
+        setUser(snapshot.val());
+        setFirstName(snapshot.val().first_name);
+        setLastName(snapshot.val().last_name);
+      });
+  }, []);
 
-//   const FooterPressHandler = () => {
-//     const first_Name = firstName;
-//     const last_Name = lastName;
-
-//     if (firstName.length == 0 || lastName.length == 0) {
-//       firstName.length == 0
-//         ? (setFirstNameErrorFlag(true), setlastNameErrorFlag(false))
-//         : (setlastNameErrorFlag(true), setFirstNameErrorFlag(false));
-//       setvalidationError(translate('not_empty'));
-//     } else if (!first_Name.match(regex)) {
-//       setFirstNameErrorFlag(true), setlastNameErrorFlag(false);
-//       setvalidationError(
-//         translate('validName') + ' ' + translate('first_name'),
-//       );
-//     } else if (!last_Name.match(regex)) {
-//       setlastNameErrorFlag(true), setFirstNameErrorFlag(false);
-//       setvalidationError(translate('validName') + ' ' + translate('last_name'));
-//     } else {
-//       setFirstNameErrorFlag(false);
-//       setlastNameErrorFlag(false);
-//       updateProfile(
-//         dispatch,
-//         email,
-//         gender,
-//         firstName,
-//         lastName,
-//         profile.img_uri,
-//         navigation,
-//         profile.user_profile.user_display_language
-//       ),
-//         navigation.goBack();
-//     }
-//   };
-
-  const CloseRBSheet = () => {
-    refRBSheet.current.close();
+  const BtnOnApplyChange = () => {
+    user.first_name = firstName;
+    user.last_name = lastName;
+console.log('^^^^');
+const firebasedata = user
+    database().ref('Users/')
+      .update({
+        firebasedata,
+      })
+      .then(response => {
+        const object = {
+          title: null,
+          message: 'data updated successfully',
+          display: true,
+          modalType: BannerSuccess,
+          priority: 'low',
+          accept: null,
+          acceptFunction: null,
+          duration: 3000,
+        };
+        showBannerAlert(dispatch, object);
+        navigation.goBack()
+      })
+      .catch(error => console.log('ERROR', error));
+    console.log('$$$', user);
   };
-
-  const iconContainerStyle = {
-    zIndex: 1,
-    position: 'absolute',
-    alignSelf: 'flex-end',
-    right: '5%',
-    top: 25,
-  };
-
-  const iconStyle_firstName = {
-    height: Width / 20,
-    width: Width / 20,
-    tintColor: firstNameErrorFlag ? colors.error : colors.grey,
-  };
-
-  const iconStyle_lastName = {
-    height: Width / 20,
-    width: Width / 20,
-    tintColor: lastNameErrorFlag ? colors.error : colors.grey,
-  };
-
-  const iconStyle_email = {
-    height: Width / 20,
-    width: Width / 20,
-    tintColor: colors.grey,
-  };
-
-//   const checkForChanges = () => {
-//     if (
-//       (profile.user_profile.title == gender &&
-//         profile.user_profile.first_name == firstName &&
-//         profile.user_profile.last_name == lastName &&
-//         avatar == profile.user_profile.avatar) ||
-//       email.length == 0
-//     ) {
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   };
-
   return (
-    <PaperProvider theme={theme}>
-      <View style={{flex: 1, backgroundColor: colors.yellow_statusbar}}>
-        <RBSheet
-          ref={refRBSheet}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          customStyles={{
-            container: {
-              height: calculateHeight(350),
-            },
-            wrapper: {
-              backgroundColor: colors.light_gray + 70,
-            },
-            draggableIcon: {
-              backgroundColor: colors.orange,
-            },
-          }}>
-          <ImagePickerComponent
-            CloseRBSheet={CloseRBSheet}
-            postImagePicker={false}
-            avatar={avatar}
-            setAvatar={setAvatar}
+    <View style={styles.container}>
+      <View style={styles.header}></View>
+      <Image
+        style={styles.avatar}
+        source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}
+      />
+      <View style={styles.body}>
+        <View style={styles.bodyContent}>
+          <Text style={styles.headerText}>Email</Text>
+          <TextInput
+            value={user.email}
+            editable={false}
+            style={[
+              styles.TextInputStyle,
+              {
+                backgroundColor: colors.dark_gray,
+              },
+            ]}
           />
-        </RBSheet>
 
-        <Header title={editProfile} navigation={navigation} />
-        <KeyboardAwareScrollView
-          style={{
-            backgroundColor: colors.main_back,
-            flex: 1,
-            // marginBottom: 50,
-          }}
-          nestedScrollEnabled={true}
-          keyboardShouldPersistTaps={'always'}>
-          <View
-            style={{
-              // height: Height / 1.66,
-              backgroundColor: colors.white,
-              margin: calculateHeight(16),
-              paddingBottom: 20,
-              marginVertical: calculateHeight(24),
-            }}>
-            <View style={{marginVertical: calculateHeight(40)}}>
-              {avatar == '' || avatar == undefined ? (
-                <Image
-                  source={require('../../assets/dummy_user.png')}
-                  style={styles.profileImage}
-                  resizeMode={'cover'}
-                />
-              ) : (
-                <Image
-                  source={{
-                    uri: avatar,
-                  }}
-                  style={styles.profileImage}
-                  resizeMode={'cover'}
-                />
-              )}
-              <TouchableOpacity
-                onPress={() => {
-                  refRBSheet.current.open();
-                }}
-                activeOpacity={0.8}
-                style={styles.camera}>
-                <Image
-                  source={require('../../assets/camera.jpg')}
-                  style={{
-                    height: calculateHeight(12.17),
-                    width: calculateWidth(14.11),
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={{marginHorizontal: calculateHeight(16)}}>
-              <View
-                style={{
-                  // marginHorizontal: '1%',
-                  position: 'relative',
-                  justifyContent: 'center',
-                }}>
-                <TextInput
-                  disabled={true}
-                  label={translate('email')}
-                  value={email}
-                  setValue={setEmail}
-                />
-              </View>
-            
-              <View
-                style={{
-                  // marginHorizontal: '1%',
-                  marginTop: calculateHeight(16),
-                  position: 'relative',
-                  justifyContent: 'center',
-                }}>
-                <TextInput
-                  label={translate('first_name')}
-                  mode={'outlined'}
-                  value={firstName}
-                  setValue={setFirstName}
-                  focusable={firstNameErrorFlag}
-                  errorMsg={validationError}
-                  onChange={() => {
-                    setFirstNameErrorFlag(false);
-                  }}
-                  rightIcon={firstName.length > 0 ? true : false}
-                  iconName={'close'}
-                  iconColor={
-                    firstNameErrorFlag ? colors.error : colors.dark_gray
-                  }
-                  onIconPress={() => {
-                    setFirstName('');
-                    setFirstNameErrorFlag(false);
-                  }}
-                />
-              </View>
-              <View
-                style={{
-                  // marginHorizontal: '1%',
-                  marginTop: calculateHeight(16),
-                  position: 'relative',
-                  justifyContent: 'center',
-                }}>
-                <TextInput
-                  label={translate('last_name')}
-                  value={lastName}
-                  setValue={setLastName}
-                  focusable={lastNameErrorFlag}
-                  errorMsg={validationError}
-                  onChange={() => {
-                    setlastNameErrorFlag(false);
-                  }}
-                  rightIcon={lastName.length > 0 ? true : false}
-                  iconName={'close'}
-                  iconColor={
-                    lastNameErrorFlag ? colors.error : colors.dark_gray
-                  }
-                  onIconPress={() => {
-                    setLastName('');
-                    setlastNameErrorFlag(false);
-                  }}
-                />
-              </View>
-            </View>
-          </View>
-        </KeyboardAwareScrollView>
-        <Footer
-          title="apply_change"
-          // FooterPressHandler={FooterPressHandler}
-          // disable={checkForChanges()}
-          // loading={profile.loading}
-        />
-        <SafeAreaView style={{flex: 0, backgroundColor: colors.border}} />
+          <Text style={styles.headerText}>First Name</Text>
+          <TextInput
+            value={firstName}
+            style={styles.TextInputStyle}
+            onChangeText={text => {
+              setFirstName(text);
+            }}
+          />
+
+          <Text style={styles.headerText}>Last Name</Text>
+          <TextInput
+            value={lastName}
+            style={styles.TextInputStyle}
+            onChangeText={text => {
+              setLastName(text);
+            }}
+          />
+
+          <TouchableOpacity
+            style={styles.btnStyle}
+            onPress={() => BtnOnApplyChange()}>
+            <Text style={styles.headerText}>Apply Change</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </PaperProvider>
+    </View>
   );
 };
 
 export default EditProfile;
 
-const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: colors.orange,
-    text: colors.dark_gray,
-  },
-};
-
 const styles = StyleSheet.create({
-  camera: {
-    zIndex: 1,
+  header: {
+    backgroundColor: colors.yellow_statusbar,
+    height: calculateHeight(200),
+    borderBottomLeftRadius: calculateWidth(20),
+    borderBottomRightRadius: calculateWidth(20),
+  },
+  avatar: {
+    width: calculateWidth(130),
+    height: calculateWidth(130),
+    borderRadius: calculateWidth(63),
+    borderWidth: calculateHeight(4),
+    borderColor: 'white',
+    marginBottom: calculateHeight(10),
+    alignSelf: 'center',
     position: 'absolute',
-    left: calculateWidth(210),
-    top: calculateHeight(74),
-    backgroundColor: colors.map_strock,
-    borderRadius: 22,
-    height: calculateHeight(25.72),
-    width: calculateHeight(25.72),
+    marginTop: calculateHeight(130),
+  },
+  name: {
+    fontSize: sizes.large,
+    color: colors.map_strock,
+    fontWeight: '600',
+  },
+  body: {
+    marginTop: calculateHeight(40),
+  },
+  bodyContent: {
+    padding: calculateWidth(30),
+  },
+  name: {
+    fontSize: 28,
+    color: '#696969',
+    fontWeight: '600',
+  },
+  info: {
+    fontSize: sizes.medium,
+    color: colors.map_strock,
+    marginTop: calculateHeight(10),
+  },
+  description: {
+    fontSize: 16,
+    color: colors.dark_gray,
+    marginTop: calculateHeight(10),
+    textAlign: 'center',
+  },
+  headerText: {
+    fontSize: sizes.medium,
+    color: colors.black,
+    fontWeight: 'bold',
+    marginTop: calculateHeight(10),
+  },
+  TextInputStyle: {
+    backgroundColor: colors.light_gray + 80,
+    marginTop: calculateHeight(10),
+    fontSize: sizes.label_text,
+    color: colors.black,
+    fontWeight: 'bold',
+    fontSize: sizes.subtitle,
+  },
+  btnStyle: {
+    backgroundColor: colors.yellow_statusbar,
+    marginTop: calculateHeight(30),
+    height: calculateHeight(55),
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  profileImage: {
-    height: calculateHeight(104),
-    width: calculateHeight(104),
-    borderRadius: calculateHeight(500),
-    borderColor: colors.orange,
-    borderWidth: 2,
-    alignSelf: 'center',
-    position: 'relative',
   },
 });
